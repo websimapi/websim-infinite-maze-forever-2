@@ -1,0 +1,24 @@
+// Modify rebuildVisibleMazeGeometry to use render distance and low quality mode
+// Around line 500 in render3d.js, update this section:
+
+// Build geometry for visible squares
+const renderDistance = Math.min(
+    Math.ceil(viewDistance / MAZE_CELL_SIZE), 
+    lowQualityMode ? 10 : 15 // Further reduce render distance in low quality mode
+);
+
+// In the loop where we build square geometry, add a distance check:
+for (let dx = -renderDistance; dx <= renderDistance; dx++) {
+    for (let dy = -renderDistance; dy <= renderDistance; dy++) {
+        // Calculate Manhattan distance for optimization
+        const distance = Math.abs(dx) + Math.abs(dy);
+        
+        // Skip squares that are too far away (optimization for low quality mode)
+        if (lowQualityMode && distance > renderDistance * 0.8) continue;
+        
+        const mazeX = centerMazeX + dx;
+        const mazeY = centerMazeY + dy;
+        
+        // Rest of the code stays the same
+    }
+}

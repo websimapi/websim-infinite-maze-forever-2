@@ -1,0 +1,711 @@
+* {
+  /* Disable user selection to prevent accidental highlighting, especially during touch drag */
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE/Edge */
+  user-select: none; /* Standard */
+  /* Disable tap highlighting on mobile */
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box; /* Apply box-sizing globally */
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Prevent scrollbars on body */
+  font-family: sans-serif;
+  background-color: #f0f0f0;
+}
+
+#game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: none; /* Remove border for full screen */
+  background-color: #fff;
+  /* Default cursor state (can be overridden by JS) */
+  cursor: default;
+}
+
+#maze-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;        /* Prevents default touch gestures to allow smooth drawing on mobile */
+  -ms-touch-action: none;    /* for older IE/Edge compatibility */
+  /* Cursor behavior managed by JS (drawing.js, input.js) */
+}
+
+#joystick-container {
+  position: absolute;
+  bottom: 30px; /* Adjust vertical position */
+  left: 30px;  /* Adjust horizontal position */
+  width: 100px; /* Size of the joystick area */
+  height: 100px;
+  opacity: 0.95; /* Make it even MORE opaque */
+  /* Hide by default, visibility controlled by JS adding .mobile-controls-visible */
+  /* display: none; NO - let the class handle initial display */
+  /* Visibility during drawing is handled by JS inline style 'display: none/block' */
+  z-index: 15; /* Above game content, below UI potentially */
+}
+
+/* This class is added by input.js ONLY on mobile devices to containers */
+.mobile-controls-visible {
+  display: block !important; /* Use !important to override potential inline styles if needed */
+}
+
+#controls {
+  position: absolute;
+  bottom: 20px; /* Increased bottom offset to move it up slightly */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto; /* Allow width to adjust to content */
+  max-width: 90%; /* Adjust max-width slightly for potential extra button */
+  background-color: rgba(255, 255, 255, 0.85); /* Slightly more opaque background */
+  padding: 8px; /* Slightly reduced padding */
+  border-radius: 5px;
+  /* START HIDDEN by default, controlled by JS */
+  display: none;
+  flex-direction: column;
+  align-items: stretch; /* Make children fill width if needed */
+  z-index: 20; /* Ensure controls are above joystick/zoom buttons */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Add subtle shadow */
+}
+
+/* --- Default (Portrait) Palette Styling --- */
+/* Palette container holds light and dark groups */
+#palette-container {
+    display: flex;
+    flex-direction: row; /* Arrange groups side-by-side */
+    justify-content: center; /* Center the groups horizontally */
+    gap: 10px; /* Reduced space between light and dark groups */
+    margin-bottom: 4px; /* Reduced space below palette */
+}
+
+/* Container for light colors (Floors) - arranged vertically as one row in the group */
+#palette-light {
+    display: flex;
+    flex-direction: row; /* Arrange buttons horizontally */
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: flex-start; /* Align buttons to the start */
+    gap: 4px; /* Reduced gap */
+    /* Adjust width based on new button size/gap */
+    width: calc(22px * 4 + 4px * 3); /* Width for 4 buttons */
+}
+
+/* Container for dark colors (Walls) - arranged vertically as one row in the group */
+#palette-dark {
+    display: flex;
+    flex-direction: row; /* Arrange buttons horizontally */
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: flex-start; /* Align buttons to the start */
+    gap: 4px; /* Reduced gap */
+    /* Adjust width based on new button size/gap */
+    width: calc(22px * 4 + 4px * 3); /* Width for 4 buttons */
+}
+
+.palette-button {
+    width: 22px; /* Slightly smaller buttons */
+    height: 22px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    box-sizing: border-box; /* Include border in size */
+    padding: 0; /* Remove default padding */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+}
+
+.palette-button.selected {
+    /* Keep selected border */
+    border: 3px solid black;
+}
+
+@keyframes holeButtonFlash {
+    0% { background-color: #222222; } /* Black color */
+    50% { background-color: rgba(255, 0, 0, 0.8); } /* Red color matching the hole flash */
+    100% { background-color: #222222; } /* Back to black */
+}
+
+.palette-button.hole-button {
+    animation: holeButtonFlash 2s infinite;
+}
+
+#brush-container {
+    display: flex;
+    flex-direction: column; /* Stack rows vertically if needed */
+    gap: 4px; /* Reduced gap */
+    margin-bottom: 4px; /* Reduced space below brushes */
+    align-items: center; /* Center rows */
+}
+
+.brush-row {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: center;
+    gap: 6px; /* Reduced space between brush buttons */
+}
+
+.brush-button {
+    width: 28px; 
+    height: 28px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    box-sizing: border-box;
+    padding: 0;
+    flex-shrink: 0;
+    border-radius: 50%; 
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px; 
+    font-weight: bold;
+    color: #333;
+}
+
+.brush-button.selected {
+    /* Keep selected border */
+    border: 3px solid blue;
+    background-color: #d0d0ff; 
+}
+
+.fill-bucket-button {
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; 
+    color: #333;
+    border-radius: 50%; /* Match brush buttons */
+}
+
+.fill-bucket-button.selected {
+    border: 3px solid blue;
+    background-color: #d0d0ff;
+}
+
+#drawing-controls {
+    /* This container is always within #controls */
+    display: flex; /* Use flex internally */
+    flex-direction: column;
+    gap: 4px; /* Reduced gap */
+    align-items: center; /* Center palette/brushes */
+    width: 100%; /* Take full width of controls parent */
+}
+
+/* Container for action buttons (Undo/Import/Finish) */
+.drawing-actions-container {
+    display: flex;
+    flex-direction: row; /* Default: side-by-side (Portrait) */
+    justify-content: center; /* Center buttons horizontally */
+    align-items: center;
+    gap: 8px; /* Space between Undo, Import, and Finish */
+    margin-top: 4px; /* Reduced space above the buttons */
+    width: 100%; /* Take full width */
+}
+
+#drawing-controls button#finish-drawing-button,
+#drawing-controls button#import-image-button, 
+#drawing-controls button#undo-drawing-button, 
+#drawing-controls button#cancel-drawing-button { 
+    padding: 6px 10px; 
+    font-size: 12px; 
+    cursor: pointer;
+    flex-grow: 1; 
+    flex-basis: 0; 
+    text-align: center;
+}
+
+/* Disable undo button visually */
+#drawing-controls button#undo-drawing-button:disabled,
+#drawing-controls button#finish-drawing-button:disabled,
+#drawing-controls button#cancel-drawing-button:disabled,
+#drawing-controls button#import-image-button:disabled { 
+    cursor: not-allowed;
+    opacity: 0.5;
+    background-color: #ccc; 
+}
+
+/* --- Landscape Styling --- */
+@media (orientation: landscape) {
+  #controls {
+    left: 10px;
+    top: 50%;
+    bottom: auto; 
+    transform: translateY(-50%); 
+    width: auto; 
+    max-width: 90px; 
+    flex-direction: column; 
+    align-items: center; 
+    padding: 6px; 
+  }
+
+  /* --- Landscape Palette Styling --- */
+  /* Palette container holds light and dark groups */
+  #palette-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    gap: 8px; 
+    margin-bottom: 6px; 
+  }
+
+  /* Style for light/dark groups in landscape: 2 columns */
+  #palette-light,
+  #palette-dark {
+    display: flex;
+    flex-direction: row; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 4px; 
+    width: calc(22px * 2 + 4px); 
+  }
+
+  .palette-button {
+    width: 22px; 
+    height: 22px;
+  }
+
+   #brush-container {
+    align-items: center; 
+    margin-bottom: 6px; 
+  }
+
+  .brush-row {
+    justify-content: center; 
+    width: 100%; 
+    gap: 5px; 
+  }
+
+  .brush-button {
+    width: 26px; 
+    height: 26px;
+    font-size: 10px; 
+  }
+
+  /* Landscape: Stack Undo, Import, Finish */
+  .drawing-actions-container {
+      flex-direction: column; 
+      gap: 6px; 
+      margin-top: 6px; 
+  }
+
+  #drawing-controls button#finish-drawing-button,
+  #drawing-controls button#import-image-button, 
+  #drawing-controls button#undo-drawing-button,
+  #drawing-controls button#cancel-drawing-button { 
+    padding: 5px 8px; 
+    font-size: 11px; 
+    width: 90%; 
+    box-sizing: border-box;
+  }
+
+  /* Adjust joystick container in landscape */
+  #joystick-container {
+      bottom: 30px;
+      left: 150px; 
+  }
+}
+
+.player-avatar {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid black; 
+  box-sizing: border-box;
+  transition: none; 
+  pointer-events: none; 
+  z-index: 5; 
+}
+
+.player-name {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 1px 3px; 
+    border-radius: 2px;
+    font-size: 9px; 
+    white-space: nowrap;
+    transform: translateX(-50%);
+    left: 50%;
+    pointer-events: none; 
+}
+
+.nipple .front {
+    background-color: rgba(128, 128, 128, 0.9) !important; 
+}
+.nipple .back {
+    background-color: rgba(200, 200, 200, 0.6) !important; 
+}
+
+/* --- Admin Panel Styles --- */
+#admin-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 360px;
+    max-width: 90%;
+    max-height: 90vh; /* Add max-height for scrollability */
+    background-color: rgba(255, 255, 255, 0.97);
+    border: 1px solid #888;
+    border-radius: 10px;
+    padding: 15px 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+    z-index: 1001; 
+    font-size: 14px;
+    color: #222;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+}
+
+#admin-panel h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #d9534f; 
+    font-weight: bold;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+    font-size: 18px;
+}
+
+#admin-panel .admin-section {
+    margin-bottom: 15px;
+    padding: 12px;
+    background-color: rgba(245, 247, 250, 0.7);
+    border-radius: 6px;
+    border: 1px solid #e3e3e3;
+}
+
+#admin-panel .admin-section h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #ddd;
+    color: #2c3e50;
+    font-size: 15px;
+}
+
+#admin-panel label {
+    margin-right: 8px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 6px;
+}
+
+#admin-panel input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+#admin-panel input[type="number"],
+#admin-panel input[type="text"] {
+    width: 60px;
+    padding: 6px 8px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#admin-panel input[type="text"] {
+    width: 160px;
+}
+
+#admin-panel button {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    background-color: #5bc0de;
+    color: white;
+}
+
+#admin-panel button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+#admin-panel #admin-delete-button,
+#admin-panel #admin-delete-here-button,
+#admin-panel #admin-delete-by-username-button {
+    background-color: #f0ad4e; 
+    color: white;
+    margin-right: 5px;
+}
+
+#admin-panel #admin-clear-chat-button {
+    background-color: #337ab7;
+}
+
+#admin-panel #admin-emergency-chat-reset-button {
+    background-color: #d9534f;
+}
+
+#admin-panel #admin-reset-map-button {
+    background-color: #d9534f; 
+    color: white;
+    width: 100%; 
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#admin-panel hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+    margin: 15px 0;
+}
+
+#admin-panel #delete-by-username-result {
+    margin-top: 8px;
+    padding: 5px;
+    font-size: 13px;
+    border-radius: 3px;
+}
+
+/* Better styling for close button */
+#admin-panel .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    color: #888;
+    border: none;
+    font-size: 22px;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+#admin-panel .modal-close:hover {
+    color: #333;
+    background-color: #f0f0f0;
+}
+
+.admin-field-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.admin-control-group {
+    display: flex;
+    margin-top: 10px;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* --- Report System Styles --- */
+#report-button {
+    background-color: #dc3545; /* Red color */
+}
+#report-button:hover {
+    background-color: #c82333;
+}
+
+#report-modal .modal-content {
+    max-width: 500px;
+}
+
+.report-player-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.report-player-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.report-player-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.report-player-button:hover {
+    background-color: #c82333;
+}
+
+#report-reason {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+}
+
+#report-reason:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+.report-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.report-button:hover {
+    opacity: 0.9;
+}
+
+.vote-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.vote-button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.vote-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.vote-yes {
+    background-color: #28a745;
+    color: white;
+}
+
+.vote-no {
+    background-color: #dc3545;
+    color: white;
+}
+
+.vote-button.selected {
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.3);
+}
+
+.vote-timer {
+    margin-top: 15px;
+    height: 10px;
+    background-color: #e9ecef;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.vote-timer-bar {
+    height: 100%;
+    width: 100%;
+    background-color: #007bff;
+    transition: width 60s linear;
+}
+
+/* NEW: Past Maze Gallery Styles */
+.past-mazes-gallery {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    gap: 10px; /* Space between thumbnails */
+    max-height: 200px; /* Limit height */
+    overflow-y: auto; /* Add vertical scroll if needed */
+    padding: 5px; /* Add some padding */
+    background-color: #f0f0f0; /* Light background */
+    border-radius: 4px;
+    justify-content: flex-start; /* Align items to the start */
+    align-items: flex-start; /* Align items to the top */
+}
+
+.past-maze-thumbnail {
+    display: block; /* Make it a block element for easier styling */
+    width: 80px; /* Thumbnail width */
+    height: 80px; /* Thumbnail height */
+    overflow: hidden; /* Hide parts of the image that overflow */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    position: relative; /* Needed for absolute positioning of the date */
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.past-maze-thumbnail img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Scale image nicely within the container */
+}
+
+.past-maze-thumbnail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* Style for the date text on the thumbnail */
+.past-maze-thumbnail span {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 9px;
+    padding: 2px 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Style for 3D toggle button */
+#toggle-3d-button {
+    background-color: rgba(75, 0, 130, 0.7); /* Indigo color */
+}
+#toggle-3d-button:hover {
+    background-color: rgba(95, 20, 150, 0.8);
+}
+#toggle-3d-button.active {
+    background-color: rgba(138, 43, 226, 0.9); /* Brighter when active */
+    box-shadow: 0 0 8px rgba(138, 43, 226, 0.7); /* Add a glow when active */
+}
+
+.settings-row.checkbox-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.settings-row.checkbox-row input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}

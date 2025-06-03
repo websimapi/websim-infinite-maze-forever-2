@@ -1,0 +1,224 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Infinite Maze FOREVER</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="ui.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="maze-canvas"></canvas>
+    <div id="joystick-container"></div>
+    <div id="zoom-buttons">
+        <button id="zoom-in-button" class="zoom-button">+</button>
+        <button id="zoom-out-button" class="zoom-button">-</button>
+    </div>
+    <!-- Container for top-left UI elements -->
+    <div id="top-left-ui">
+      <div id="player-info"></div>
+      <button id="toggle-chat-button">💬</button>
+    </div>
+
+    <!-- Container for top-right buttons -->
+    <div id="top-right-buttons">
+        <button id="settings-button" class="top-right-button" title="Settings">⚙️</button>
+        <button id="info-button" class="top-right-button" title="Show Help">?</button>
+        <button id="stats-button" class="top-right-button" title="Show Stats">📊</button>
+        <button id="toggle-3d-button" class="top-right-button" title="Toggle 3D Mode">🔄</button>
+        <button id="save-image-button" class="top-right-button" title="Save as Image">💾</button>
+        <button id="admin-panel-button" class="top-right-button" title="Admin Panel">🛠️</button>
+    </div>
+
+    <div id="controls">
+      <div id="drawing-controls">
+        <div id="palette-container">
+          <!-- Palette buttons will be added here by JS -->
+        </div>
+        <div id="brush-container">
+            <!-- Brush size buttons will be added here by JS -->
+        </div>
+        <!-- NEW: Container for action buttons -->
+        <div class="drawing-actions-container">
+          <button id="undo-drawing-button" disabled>Undo</button>
+          <!-- Hidden input for image import -->
+          <input type="file" id="import-image-input" accept="image/*" style="display: none;">
+          <button id="import-image-button">Import Img</button>
+          <button id="cancel-drawing-button">Cancel</button>
+          <button id="finish-drawing-button">Finish Drawing</button>
+        </div>
+      </div>
+    </div>
+    <div id="player-list">
+        <!-- Player list content (now a table) will be added here by JS -->
+    </div>
+    <!-- Chat Window - Positioned by CSS -->
+    <div id="chat-container">
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="Type message..." maxlength="150">
+    </div>
+  </div>
+
+  <!-- Info Modal -->
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <h2>How to Play</h2>
+      <p>
+        Explore an infinite maze that you and others create together!
+      </p>
+      <ul>
+        <li><strong>Movement:</strong>
+          <ul>
+            <li><strong>Desktop:</strong> WASD or Arrow Keys. Click canvas to lock mouse for look-based movement.</li>
+            <li><strong>Mobile:</strong> Use the joystick that appears in the bottom-left.</li>
+          </ul>
+        </li>
+        <li><strong>Drawing:</strong> Walk into an empty black/patterned square to claim it and start drawing. Use the palette, brush, and <strong>Undo</strong> tools that appear. Click 'Finish Drawing' when done. Your drawing will be checked by AI for appropriateness before being saved.</li>
+        <li><strong>Importing Images:</strong> While drawing, click 'Import Img' to select an image file. It will be scaled and converted to the available palette colors. Dithering can be toggled in Settings.</li>
+        <li><strong>Colors:</strong> Light colors are floors (you can walk on them), dark colors are walls (you can't walk through them).</li>
+        <li><strong>Zoom:</strong> Use the mouse wheel (desktop) or the +/- buttons (mobile) to zoom.</li>
+        <li><strong>Chat:</strong> Use the input box below the messages to chat. Click the 💬 button next to your coordinates to toggle the chat window.</li>
+        <li><strong>3D Mode:</strong> Toggle 3D Mode in Settings to explore the maze in first-person view. In 3D Mode, use the mouse to look and WASD/arrow keys to move in the direction you're facing.</li>
+        <li><strong>Other Buttons:</strong> ⚙️ (Settings) adjusts controls. 📊 (Stats) shows maze info and past maps. ? (Info) shows this help. 🔄 (Reset) casts your vote to reset the entire map. If 60% of players vote, the map resets! 💾 (Save) saves an image of the maze.</li>
+      </ul>
+       <p>
+         Tip: You can only enter squares that are truly empty (black/patterned). You cannot enter squares currently being drawn by others (indicated by a rainbow overlay and username). If a square looks empty but you can't enter, the map might be syncing - try again shortly!
+       </p>
+       <hr>
+       <p>
+         <strong>Saving Images:</strong> Use the 💾 button to save an image. You can choose to save just the square you are currently in, or the entire discovered map. Large maps may take time to generate!
+       </p>
+       <hr>
+       <p>
+           <strong>Content Moderation:</strong> Drawings are automatically checked by an AI for inappropriate content (NSFW, hate speech, etc.). Rejected drawings will not be saved. Moderation occurs both when finishing a single square and across adjacent squares by the same user.
+       </p>
+       <hr>
+       <p style="font-size: 0.9em; text-align: center;">
+         Original idea credit: Charles Lehner<br>
+         Made by BookwormKevin using websim
+       </p>
+    </div>
+  </div>
+
+  <!-- Stats Modal -->
+  <div id="stats-modal" class="modal">
+      <div class="modal-content">
+          <button class="modal-close">&times;</button>
+          <h2>Maze Statistics</h2>
+          <div id="maze-stats-content">
+              <p>Loading maze stats...</p>
+          </div>
+          <hr>
+          <h3>Top Contributors (Current Map)</h3>
+          <div id="leaderboard-content">
+              <p>Loading leaderboard...</p>
+          </div>
+          <hr>
+          <!-- NEW: Past Maze Gallery -->
+          <h3>Past Mazes</h3>
+          <div id="past-mazes-gallery" class="past-mazes-gallery">
+              <p>Loading past mazes...</p>
+              <!-- Thumbnails will be added here by JS -->
+          </div>
+      </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>Settings</h2>
+        <div class="settings-section">
+            <h4>Movement Controls</h4>
+            <div class="settings-row">
+                <label class="settings-label" for="keyboard-speed">Keyboard/Joystick Speed:</label>
+                <span class="settings-value" id="keyboard-speed-value">10.0</span>
+                <input type="range" id="keyboard-speed" class="settings-slider" min="5" max="20" step="0.5" value="10">
+            </div>
+            <div class="settings-row">
+                <label class="settings-label" for="mouse-sensitivity">Mouse Sensitivity:</label>
+                <span class="settings-value" id="mouse-sensitivity-value">0.01</span>
+                <input type="range" id="mouse-sensitivity" class="settings-slider" min="0.001" max="0.05" step="0.001" value="0.01">
+            </div>
+            <div class="settings-row checkbox-row">
+                <label class="settings-label" for="mouse-movement-checkbox">
+                    <input type="checkbox" id="mouse-movement-checkbox" checked> Enable Mouse Movement
+                </label>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h4>Display Options</h4>
+            <div class="settings-row checkbox-row">
+              <label class="settings-label" for="dithering-checkbox">
+                <input type="checkbox" id="dithering-checkbox" checked> Enable Image Dithering
+              </label>
+            </div>
+            <div class="settings-row checkbox-row">
+              <label class="settings-label" for="mode-3d-checkbox">
+                <input type="checkbox" id="mode-3d-checkbox"> Enable 3D Mode
+              </label>
+            </div>
+            <div class="settings-row checkbox-row">
+              <label class="settings-label" for="holes-as-walls-checkbox">
+                <input type="checkbox" id="holes-as-walls-checkbox"> Treat Holes as Walls
+              </label>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h4>Navigation</h4>
+            <button id="teleport-home-button" class="settings-button">Teleport to Start (0,0)</button>
+        </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "config": "./config.js",
+        "setup": "./setup.js",
+        "mapManager": "./mapManager.js",
+        "drawing": "./drawing.js",
+        "drawingInput": "./drawingInput.js",
+        "imageImport": "./imageImport.js",
+        "players": "./players.js",
+        "mazeUtils": "./mazeUtils.js",
+        "input": "./input.js",
+        "camera": "./camera.js",
+        "renderer": "./renderer.js",
+        "squareCoordinates": "./squareCoordinates.js",
+        "squareRendererCache": "./squareRendererCache.js",
+        "collision": "./collision.js",
+        "ui": "./ui.js",
+        "chat": "./chat.js",
+        "imageExporter": "./imageExporter.js",
+        "moderation": "./moderation.js",
+        "fillBucket": "./fillBucket.js",
+        "drawingTools": "./drawingTools.js",
+        "admin": "./admin.js",
+        "adminAuth": "./adminAuth.js",
+        "drawingCancellation": "./drawingCancellation.js",
+        "teleportUtils": "./teleportUtils.js",
+        "nipplejs": "https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/+esm",
+        "squareProximity": "./squareProximity.js",
+        "reportSystem": "./reportSystem.js",
+        "userIdentity": "./userIdentity.js",
+        "chatToggle": "./chatToggle.js",
+        "buttonHandlers": "./buttonHandlers.js",
+        "editManager": "./editManager.js",
+        "startSquareProtection": "./startSquareProtection.js",
+        "drawingValidation": "./drawingValidation.js",
+        "chatReliability": "./chatReliability.js",
+        "chatMessageOrder": "./chatMessageOrder.js",
+        "initReportSystem": "./initReportSystem.js",
+        "reportFormUI": "./reportFormUI.js",
+        "settings": "./settings.js",
+        "render3d": "./render3d.js",
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module" src="script.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>

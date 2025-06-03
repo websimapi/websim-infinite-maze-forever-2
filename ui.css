@@ -1,0 +1,591 @@
+/* ui.css - Styles for UI elements like buttons, modals, info panels, chat */
+
+#top-left-ui {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center; /* Vertically align items in the container */
+  gap: 8px; /* Space between coordinates and button */
+  z-index: 10; /* Ensure it's above canvas but below modals */
+}
+
+#player-info {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px 8px;
+  border-radius: 3px;
+  font-size: 18px; /* Increased font size */
+  font-weight: bold;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+#toggle-chat-button {
+  width: 30px;
+  height: 30px;
+  background-color: rgba(100, 150, 200, 0.7); /* Unique color */
+  color: white;
+  border: none;
+  border-radius: 5px; /* Match player-info */
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+#toggle-chat-button:hover {
+  background-color: rgba(120, 170, 220, 0.8);
+}
+
+/* Container for top-right buttons */
+#top-right-buttons {
+    position: absolute;
+    top: 10px;
+    right: 190px; /* Increased from 170px to create more space */
+    display: grid;
+    grid-template-columns: repeat(2, auto); /* Changed from 3 columns to 2 */
+    grid-template-rows: repeat(3, auto);    /* Changed from 2 rows to 3 */
+    gap: 8px; /* Gap between buttons */
+    z-index: 10;
+}
+
+/* Generic styling for buttons within the grid */
+.top-right-button {
+    width: 35px; /* Slightly larger */
+    height: 35px;
+    color: white;
+    border: none;
+    border-radius: 50%; /* Circle */
+    font-size: 18px; /* Adjust icon size */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: background-color 0.2s ease;
+}
+
+/* Specific button styles (colors) */
+#home-button {
+    background-color: rgba(100, 100, 100, 0.7); /* Grey */
+}
+#home-button:hover {
+    background-color: rgba(120, 120, 120, 0.8);
+}
+
+#info-button {
+    background-color: rgba(0, 100, 200, 0.7); /* Blue */
+}
+#info-button:hover {
+    background-color: rgba(0, 120, 240, 0.8);
+}
+
+#stats-button {
+    background-color: rgba(0, 150, 50, 0.7); /* Green */
+}
+#stats-button:hover {
+    background-color: rgba(0, 170, 60, 0.8);
+}
+
+#reset-button {
+    background-color: rgba(200, 50, 50, 0.7); /* Red */
+}
+#reset-button:hover {
+    background-color: rgba(220, 70, 70, 0.8);
+}
+#reset-button.voted {
+    background-color: rgba(255, 100, 100, 0.9); /* Brighter red when voted */
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.7); /* Add a glow */
+}
+
+#save-image-button {
+    background-color: rgba(150, 0, 150, 0.7); /* Purple */
+}
+#save-image-button:hover {
+    background-color: rgba(180, 0, 180, 0.8);
+}
+
+#settings-button {
+    background-color: rgba(100, 100, 100, 0.7); /* Grey */
+}
+#settings-button:hover {
+    background-color: rgba(120, 120, 120, 0.8);
+}
+
+/* Admin Panel Toggle Button */
+#admin-panel-button {
+    background-color: rgba(218, 165, 32, 0.7); /* Goldenrod */
+    display: none; /* Hidden by default, shown only for admin */
+}
+#admin-panel-button:hover {
+    background-color: rgba(238, 185, 52, 0.8);
+}
+
+#player-list {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 180px; /* Increased from 160px to fit more content */
+  max-height: 200px; /* Limit height and allow scrolling */
+  overflow-y: auto;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px;
+  border-radius: 3px;
+  z-index: 10; /* Ensure it's above avatars */
+  font-size: 11px; /* Small font for the list */
+  line-height: 1.4;
+  /* Make scrollbar less obtrusive */
+  scrollbar-width: thin;
+  scrollbar-color: #aaa #eee;
+}
+
+#player-list-table {
+    width: 100%;
+    border-collapse: collapse; /* Remove spacing between cells */
+}
+
+#player-list-table thead th {
+    text-align: left;
+    font-weight: bold;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #ccc;
+    font-size: 12px; /* Match previous h4 size */
+}
+
+#player-list-table tbody td {
+    padding: 2px 3px; /* Add some padding to cells */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for overflowing text */
+    vertical-align: top; /* Align content to top of cell */
+    max-width: 110px; /* Limit cell width to prevent horizontal scrolling */
+}
+
+#player-list-table tbody td:first-child {
+    /* Allow username cell to take more space */
+    width: 65%;
+}
+
+#player-list-table tbody td:last-child {
+    /* Position cell */
+    width: 35%;
+    text-align: right;
+}
+
+/* Admin styling */
+.admin-username {
+    color: #2ecc71 !important; /* Bright green color for admin usernames */
+    font-weight: bold;
+}
+
+#player-list-table .admin-username {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+#chat-messages .message-admin .message-username {
+    color: #2ecc71 !important; /* Green color for admin usernames in chat */
+    font-weight: bold;
+}
+
+/* Mobile Zoom Buttons Container */
+#zoom-buttons {
+  position: absolute;
+  bottom: 30px; /* Move slightly up from the very bottom */
+  right: 20px; /* Keep some distance from the edge */
+  display: none; /* Hidden by default, shown via .mobile-controls-visible */
+  flex-direction: column;
+  gap: 10px;
+  z-index: 15;
+}
+
+.zoom-button {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(128, 128, 128, 0.8);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1; /* Ensure text is centered vertically */
+}
+
+.zoom-button:active {
+  background-color: rgba(100, 100, 100, 0.9); /* Darken on press */
+}
+
+/* --- Chat Window Styles --- */
+#chat-container {
+    position: absolute;
+    top: 50px; /* Position below #top-left-ui (approx 10px top + 30px height + 10px gap) */
+    left: 10px;
+    width: calc(100% - 20px); /* Full width minus padding */
+    max-width: 300px; /* Limit maximum width */
+    height: 150px; /* Fixed height */
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex; /* Default display state, controlled by JS */
+    flex-direction: column;
+    z-index: 12; /* Above joystick/buttons, below drawing controls if they overlap */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    font-size: 12px;
+}
+
+#chat-messages {
+    flex-grow: 1; /* Take available vertical space */
+    overflow-y: auto; /* Enable scrolling for messages */
+    padding: 5px;
+    margin-bottom: 5px;
+    /* Make scrollbar less obtrusive */
+    scrollbar-width: thin;
+    scrollbar-color: #aaa #eee;
+}
+
+#chat-messages p {
+    margin: 2px 0;
+    line-height: 1.3;
+    word-wrap: break-word; /* Wrap long words */
+}
+
+#chat-messages .message-username {
+    font-weight: bold;
+    margin-right: 5px;
+    color: #333; /* Default username color */
+}
+
+#chat-messages .message-self .message-username {
+    color: blue; /* Color for own username */
+}
+
+#chat-messages .message-system {
+    color: #555; /* Slightly darker system messages */
+    /* Font style set in JS */
+}
+#chat-messages .message-system em { /* Style the italic element */
+    font-style: italic;
+}
+
+
+#chat-input {
+    width: calc(100% - 10px); /* Full width minus padding */
+    margin: 0 5px 5px 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+
+/* --- Modal Styles --- */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+  /* Add fade-in animation */
+  animation-name: fadeIn;
+  animation-duration: 0.3s;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: 10% auto; /* 10% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Could be more or less, depending on screen size */
+  max-width: 600px; /* Maximum width */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  /* Add slide-in animation */
+  animation-name: slideIn;
+  animation-duration: 0.3s;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+/* Styles for h3 in modals */
+.modal-content h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.modal-content ul {
+    padding-left: 20px;
+}
+.modal-content ul ul {
+    padding-left: 15px;
+}
+.modal-content li {
+    margin-bottom: 8px;
+}
+.modal-content hr {
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 15px 0;
+}
+
+.modal-close {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Styles for Stats Modal Content */
+#maze-stats-content p, #leaderboard-content p {
+    margin: 5px 0;
+    line-height: 1.5;
+}
+#leaderboard-content ol {
+    padding-left: 25px;
+    margin-top: 5px;
+}
+#leaderboard-content li {
+    margin-bottom: 5px;
+}
+
+/* --- Modal Animations --- */
+@keyframes fadeIn {
+  from {opacity: 0}
+  to {opacity: 1}
+}
+
+@keyframes slideIn {
+  from {margin-top: 5%; opacity: 0;}
+  to {margin-top: 10%; opacity: 1;}
+}
+
+
+/* Landscape adjustments for UI elements */
+@media (orientation: landscape) {
+
+  /* Keep button grid top-right */
+  #top-right-buttons {
+    top: 10px;
+    right: 190px; /* Updated to match portrait mode */
+    grid-template-columns: repeat(2, auto); /* Changed from 3 columns to 2 */
+    grid-template-rows: repeat(3, auto); /* Changed from 2 rows to 3 */
+  }
+
+  /* Player list stays top-right in landscape */
+  #player-list {
+      top: 10px; /* Align top with buttons */
+      right: 10px;
+      width: 180px; /* Keep width consistent with portrait mode */
+  }
+
+  /* Adjust chat in landscape - stays top-left */
+  #chat-container {
+    top: 50px; /* Keep below top-left UI */
+    left: 10px; /* Keep left */
+    width: 300px; /* Fixed width */
+    max-width: 300px;
+    height: 150px; /* Keep same height */
+    /* Reset bottom positioning if it was set previously */
+    bottom: auto;
+  }
+}
+
+/* Settings Modal Styles */
+.settings-section {
+    margin-bottom: 15px;
+    padding: 8px;
+    background-color: rgba(245, 245, 245, 0.6);
+    border-radius: 4px;
+}
+
+.settings-section h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.settings-label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.settings-value {
+    width: 50px;
+    text-align: right;
+    margin-right: 5px;
+}
+
+.settings-slider {
+    flex: 2;
+}
+
+.settings-button {
+    width: 100%;
+    padding: 8px;
+    background-color: #4a89dc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.settings-button:hover {
+    background-color: #3a79cc;
+}
+
+#teleport-home-button {
+    width: 100%;
+    padding: 8px;
+    background-color: #4a89dc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+#teleport-home-button:hover {
+    background-color: #3a79cc;
+}
+
+.settings-row.checkbox-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.settings-row.checkbox-row label {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.settings-row.checkbox-row input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+}
+
+/* PAST MAZE GALLERY VIEWER MODAL - FULLSCREEN VIEWER */
+#maze-viewer-modal {
+    display: none;
+    position: fixed;
+    z-index: 2001; /* Above other modals */
+    left: 0; top: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.93);
+    overflow: auto;
+    animation-name: fadeIn;
+    animation-duration: 0.3s;
+}
+
+#maze-viewer-modal .modal-content {
+    background: transparent;
+    box-shadow: none;
+    max-width: none;
+    width: 100vw;
+    height: 100vh;
+    padding: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+}
+
+#maze-viewer-img {
+    display: block;
+    max-width: 96vw;
+    max-height: 88vh;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.45);
+}
+
+#maze-viewer-info {
+    position: absolute;
+    bottom: 18px;
+    left: 0; right: 0;
+    text-align: center;
+    color: white;
+    text-shadow: 0 0 7px #222;
+    background: rgba(0,0,0,0.4);
+    font-size: 16px;
+    padding: 5px 12px;
+    border-radius: 0 0 8px 8px;
+}
+
+#maze-viewer-close.modal-close {
+    z-index: 20;
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+    border-radius: 100%;
+    width: 36px;
+    height: 36px;
+    font-size: 32px;
+    transition: background 0.2s;
+}
+#maze-viewer-close.modal-close:hover,
+#maze-viewer-close.modal-close:focus {
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+}
+
+@media (max-width: 600px), (max-height: 560px) {
+  #maze-viewer-img {
+      max-width: 98vw;
+      max-height: 70vh;
+  }
+  #maze-viewer-info {
+      font-size: 13px;
+      padding: 6px 2vw;
+  }
+  #maze-viewer-close.modal-close {
+      width: 30px;
+      height: 30px;
+      font-size: 24px;
+      top: 4px;
+      right: 8px;
+  }
+}
